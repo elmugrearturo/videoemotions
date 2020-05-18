@@ -11,7 +11,6 @@ def capturar(buffer_de_imgs,
              camara=0, 
              resolucion=(1920, 1080),
              actualizacion_display=50):
-    #cap = cv2.VideoCapture(cam_num-1 + CAP_API)
     cap = cv2.VideoCapture(camara)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, resolucion[0])
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, resolucion[1])
