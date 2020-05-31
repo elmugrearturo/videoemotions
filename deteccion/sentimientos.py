@@ -2,7 +2,7 @@ import cv2, glob, random, math, numpy as np, dlib
 from sklearn.svm import SVC
 
 
-emotions = ["aburrido", "confundido","frustrado","concentrado", "neutral"] #lista de sentimientos
+emotions = ["aburrido", "confundido","frustrado","concentrado", "neutral"] #Lista de sentimientos
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat") #Archivo de marcas faciales
@@ -12,7 +12,7 @@ def get_files(emotion):
     files = glob.glob("dataset//%s//*" %emotion)
     random.shuffle(files)
     training = files[:int(len(files))] 
-    prediction=['dataset//2.png'] #Aqui se añade la imagen que quieres procesar (//para directorio MAC) (\\para Windows)
+    prediction=['dataset//2.jpeg'] #Aqui se añade la imagen que quieres procesar (//para directorio MAC) (\\para Windows)
     return training, prediction
 
 def get_landmarks(image):
@@ -27,7 +27,7 @@ def get_landmarks(image):
  
       xmean = np.mean(xlist) #Obtiene la media de ambos ejes para determinar el centro de gravedad
       ymean = np.mean(ylist)
-      xcentral = [(x-xmean) for x in xlist] #alcula distancia entre cada punto y el punto central en ambos ejes
+      xcentral = [(x-xmean) for x in xlist] #Calcula distancia entre cada punto y el punto central en ambos ejes
       ycentral = [(y-ymean) for y in ylist]
 
       if xlist[26] == xlist[29]: #Si la coordenada x del conjunto son las mismas, el ángulo es 0,  evitamos el error 'divide by 0' en la función
@@ -65,9 +65,8 @@ def make_sets():
   for emotion in emotions:
       training, prediction = get_files(emotion)
       
-      #Append data to training and prediction list, and generate labels 0-7
       for item in training:
-          image = cv2.imread(item) #Open image
+          image = cv2.imread(item) #Abrir imagen
           gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #Convertimos a escala de grises
           clahe_image = clahe.apply(gray)
           landmarks_vectorised = get_landmarks(clahe_image)
@@ -92,8 +91,8 @@ def make_sets():
   return training_data, training_labels, prediction_data, prediction_labels,
 
 
-probam1 = np.zeros((4,10))
-probam2 = np.zeros((1,4))
+probam1 = np.zeros((len(emotions),10))
+probam2 = np.zeros((1,len(emotions)))
 
 accur_lin = []
 
@@ -103,14 +102,14 @@ for i in range(0,10):
 
   npar_train = np.array(training_data) #gira el conjunto de entrenamiento en una matriz numpy para el clasificador
   npar_trainlabs = np.array(training_labels)
-  print("training SVM linear %s" %i) #entrenamiento SVM
+  print("training SVM linear %s" %i) #Entrenamiento SVM
   clf.fit(npar_train, training_labels)
 
   print("getting accuracies %s" %i) #Utilice la función score () para obtener mayor precisión
   npar_pred = np.array(prediction_data)
   pred_lin = clf.score(npar_pred, prediction_labels)
   print ("linear: ", pred_lin)
-  accur_lin.append(pred_lin) #guarda la precision en una lista
+  accur_lin.append(pred_lin) #Guarda la precision en una lista
   proba=clf.predict_proba(prediction_data)
   print ("proba: ", proba)
   probam1[:,i]=proba[1,:]
@@ -123,21 +122,20 @@ p1=round(proba[0,0],2)
 p2=round(proba[0,1],2)
 p3=round(proba[0,2],2)
 p4=round(proba[0,3],2)
+p5=round(proba[0,4],2)
 print("Mean value lin svm: %.3f" %np.mean(accur_lin)) #hacemos 10 ejecuciones para aumentar precision
 
-frame=cv2.imread('dataset\\2.png') #aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
+frame=cv2.imread('dataset//9.jpeg') #aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
 #ploteamos el resultado
-cv2.putText(frame, "Concentrado: {}".format(p1), (10, 30),
+cv2.putText(frame, "aburrido: {}".format(p1), (10, 30),
  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Feliz: {:.2f}".format(p2), (10, 60),
+cv2.putText(frame, "confundido: {:.2f}".format(p2), (10, 60),
  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Neutral: {}".format(p3), (10, 90),
+cv2.putText(frame, "frustrado: {}".format(p3), (10, 90),
  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Aburrido: {:.2f}".format(p4), (10, 120),
+cv2.putText(frame, "concentrado: {:.2f}".format(p4), (10, 120),
  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Confundido: {:.2f}".format(p5), (10, 150),
- cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Frustrado: {:.2f}".format(p6), (10, 180),
+cv2.putText(frame, "neutral: {:.2f}".format(p5), (10, 150),
  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
  
 
