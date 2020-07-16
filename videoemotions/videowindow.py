@@ -51,6 +51,11 @@ class VentanaDeVideo(QMainWindow):
         self.menu_profesor.addAction(accion_tema)
         self.menu_profesor.addAction(accion_video)
 
+        self.menu_emociones = self.barra_menus.addMenu('&Emociones')
+        accion_iniciar_deteccion = QAction("&Iniciar Deteccion", self)
+        accion_iniciar_deteccion.triggered.connect(self.iniciar_deteccion)
+        self.menu_emociones.addAction(accion_iniciar_deteccion)
+
     # SE EJECUTA AL CREAR LA VENTANA
     def start(self):
         '''Crea un hilo para recuperar la imagen y pone una tasa de 
@@ -96,6 +101,9 @@ class VentanaDeVideo(QMainWindow):
     
     def video(self):
         print("Seleccionaste video")
+
+    def iniciar_deteccion(self):
+        vc.reconociendo = not vc.reconociendo
 
     # SE EJECUTA AL CERRAR LA VENTANA
     def closeEvent(self, event):
