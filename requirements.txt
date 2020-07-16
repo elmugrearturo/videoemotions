@@ -1,0 +1,7 @@
+face-recognition
+ipdb
+keras
+opencv-python
+pip-chill
+pyqt5
+tensorflow
